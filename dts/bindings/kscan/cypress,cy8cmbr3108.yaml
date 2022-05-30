@@ -1,0 +1,13 @@
+# Copyright (c) 2020 NXP
+# SPDX-License-Identifier: Apache-2.0
+
+description: Cypress CY8CMBR3108 capacitive touch panels
+
+compatible: "cypress,cy8cmbr3108"
+
+include: [kscan.yaml, i2c-device.yaml]
+
+properties:
+    int-gpios:
+      type: phandle-array
+      required: false
