@@ -117,6 +117,12 @@ static int cy8cmbr3108_process(const struct device *dev)
 		LOG_DBG("event: %d, row: %d, col: %d", event, row, col);
 		data->callback(dev, row, col, pressed);
 	}
+#ifdef CONFIG_KSCAN_CY8CMBR3108_INTERRUPT
+	else {
+		pressed = true;
+		data->callback(dev, row, col, pressed);
+	}
+#endif
 	return 0;
 }
 
@@ -229,8 +235,6 @@ static int cy8cmbr3108_init(const struct device *dev)
 	}
 
 #ifdef CONFIG_KSCAN_CY8CMBR3108_INTERRUPT
-	int r;
-
 	data->int_gpio = device_get_binding(config->int_gpio.port);
 	if (!data->int_gpio) {
 		LOG_ERR("Could not find interrupt GPIO controller");

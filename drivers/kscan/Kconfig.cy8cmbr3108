@@ -18,7 +18,8 @@ config KSCAN_CY8CMBR3108_PERIOD
 	  Sample period in milliseconds when in polling mode.
 
 config KSCAN_CY8CMBR3108_INTERRUPT
-	bool "Enable interrupt"
+	bool "Enable interrupt"	
+	default y
 	help
 	  Enable interrupt support (requires GPIO).
 
