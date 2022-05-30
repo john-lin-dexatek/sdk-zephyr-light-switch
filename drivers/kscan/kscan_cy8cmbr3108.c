@@ -68,7 +68,7 @@ static int cy8cmbr3108_process(const struct device *dev)
 	int r;
 	uint8_t event;
 	uint8_t row=0xFF, col=0xFF;
-	bool pressed;
+	bool pressed = false;
 	uint8_t localReadBuffer[CY8CMBR3xxx_SENSOR_STATUS_LENGTH];
 	uint8_t retry_count=3;
 	uint8_t index;
@@ -119,7 +119,6 @@ static int cy8cmbr3108_process(const struct device *dev)
 	}
 #ifdef CONFIG_KSCAN_CY8CMBR3108_INTERRUPT
 	else {
-		pressed = true;
 		data->callback(dev, row, col, pressed);
 	}
 #endif
