@@ -15,9 +15,8 @@
 #include <logging/log.h>
 LOG_MODULE_REGISTER(cy8cmbr3108, CONFIG_KSCAN_LOG_LEVEL);
 
-/* REGISTERS */
-#define REG_DEVICE_ID		0x90U
-
+#include "cypress_vendor_code/CY8CMBR3xxx_APIs.h"
+#include "cypress_vendor_code/CY8CMBR3xxx_Registers.h"
 
 /** GPIO DT information. */
 struct gpio_dt_info {
@@ -66,44 +65,58 @@ static int cy8cmbr3108_process(const struct device *dev)
 {
 	const struct cy8cmbr3108_config *config = dev->config;
 	struct cy8cmbr3108_data *data = dev->data;
-
-	int r = -1;
-	uint8_t points;
-	uint8_t coords[4U];
+	int r;
 	uint8_t event;
-	uint16_t row, col;
+	uint8_t row=0xFF, col=0xFF;
 	bool pressed;
+	uint8_t localReadBuffer[CY8CMBR3xxx_SENSOR_STATUS_LENGTH];
+	uint8_t retry_count=3;
+	uint8_t index;
+	typedef struct {
+		int8_t x;
+		int8_t y;
+	} coordinate_type;
+	coordinate_type layout_map[] = {
+		{0, 1},
+		{0, 0},
+		{1, 1},
+		{-1, -1},
+		{2, 0},
+		{2, 1},
+		{1, 0},
+		{-1, -1},		
+	};
+	CY8CMBR3xxx_SENSORSTATUS sensor_status;
 
 	/* obtain number of touch points (NOTE: multi-touch ignored) */
-	while (r < 0) {
-		r = i2c_burst_read(data->i2c, config->i2c_address, REG_DEVICE_ID, coords, 2);
-
-		k_busy_wait(10000);//10ms
+	while (retry_count) {
+		r = i2c_burst_read(data->i2c, config->i2c_address, CY8CMBR3xxx_BUTTON_STAT, localReadBuffer, CY8CMBR3xxx_SENSOR_STATUS_LENGTH);
+		if (r < 0) {
+			k_busy_wait(10000);//10ms
+			retry_count--;
+		}
+		else {
+			break;
+		}
 	}
 
-	// points = (points >> TOUCH_POINTS_POS) & TOUCH_POINTS_MSK;
-	// if (points != 0U && points != 1U) {
-	// 	return 0;
-	// }
+	parse_sensor_status(localReadBuffer, &sensor_status);
+	LOG_DBG("buttonStatus 0x%04x", sensor_status.buttonStatus);
 
-	// /* obtain first point X, Y coordinates and event from:
-	//  * REG_P1_XH, REG_P1_XL, REG_P1_YH, REG_P1_YL.
-	//  */
-	// r = i2c_burst_read(data->i2c, config->i2c_address, REG_P1_XH, coords,
-	// 		   sizeof(coords));
-	// if (r < 0) {
-	// 	return r;
-	// }
-
-	// event = (coords[0] >> EVENT_POS) & EVENT_MSK;
-	// row = ((coords[0] & POSITION_H_MSK) << 8U) | coords[1];
-	// col = ((coords[2] & POSITION_H_MSK) << 8U) | coords[3];
-	// pressed = (event == EVENT_PRESS_DOWN) || (event == EVENT_CONTACT);
-
-	LOG_DBG("event: %d, row: %d, col: %d, device_id: %x %x", event, row, col, coords[0], coords[1]);
-
-	data->callback(dev, row, col, pressed);
-
+	for (index = 0; index < sizeof(layout_map)/sizeof(coordinate_type); index++) {
+		if (sensor_status.buttonStatus & (0x01 << index)) {
+			row = layout_map[index].x;
+			col = layout_map[index].y;
+			break;
+		}
+	}
+	
+	if (row != 0xFF) {
+		event = (uint8_t)sensor_status.buttonStatus;
+		pressed = true;
+		LOG_DBG("event: %d, row: %d, col: %d", event, row, col);
+		data->callback(dev, row, col, pressed);
+	}
 	return 0;
 }
 
@@ -173,10 +186,30 @@ static int cy8cmbr3108_disable_callback(const struct device *dev)
 	return 0;
 }
 
+const unsigned char CY8CMBR3108_configuration[128] = {
+    0x77u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x80u, 0x80u, 0x80u, 0x7Fu,
+    0x80u, 0x80u, 0x80u, 0x7Fu, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x01u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x80u,
+    0x05u, 0x00u, 0x00u, 0x02u, 0x00u, 0x02u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x1Eu, 0x1Eu, 0x00u,
+    0x00u, 0x1Eu, 0x1Eu, 0x00u, 0x00u, 0x00u, 0x01u, 0x01u,
+    0x00u, 0xFFu, 0xFFu, 0xFFu, 0xFFu, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x24u, 0x03u, 0x01u, 0x69u,
+    0x00u, 0x37u, 0x06u, 0x00u, 0x00u, 0x0Au, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u,
+    0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x00u, 0x49u, 0x25u
+};
+
 static int cy8cmbr3108_init(const struct device *dev)
 {
 	const struct cy8cmbr3108_config *config = dev->config;
 	struct cy8cmbr3108_data *data = dev->data;
+	int r = -1;
 
 	data->i2c = device_get_binding(config->i2c_name);
 	if (!data->i2c) {
@@ -187,6 +220,13 @@ static int cy8cmbr3108_init(const struct device *dev)
 	data->dev = dev;
 
 	k_work_init(&data->work, cy8cmbr3108_work_handler);
+
+	/* init registers */ 
+	while (r < 0) {
+		r = i2c_burst_write(data->i2c, config->i2c_address, 0x00, 
+			CY8CMBR3108_configuration, sizeof(CY8CMBR3108_configuration));
+		k_busy_wait(10000);//10ms
+	}
 
 #ifdef CONFIG_KSCAN_CY8CMBR3108_INTERRUPT
 	int r;

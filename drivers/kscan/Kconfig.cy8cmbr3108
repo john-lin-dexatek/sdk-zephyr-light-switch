@@ -13,7 +13,7 @@ if KSCAN_CY8CMBR3108
 config KSCAN_CY8CMBR3108_PERIOD
 	int "Sample period"
 	depends on !KSCAN_CY8CMBR3108_INTERRUPT
-	default 10
+	default 500
 	help
 	  Sample period in milliseconds when in polling mode.
 
