@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 description: |
-    Capella CM3218 Light Sensor. 
+    Capella CM32183 Light Sensor. 
 
-compatible: "capella,cm3218"
+compatible: "capella,cm32183"
 
 include: [sensor-device.yaml, i2c-device.yaml]
 

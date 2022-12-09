@@ -1,4 +1,4 @@
-/* sensor_isl29035.c - trigger support for ISL29035 light sensor */
+/* sensor_stts75.c - trigger support for STTS75 light sensor */
 
 /*
  * Copyright (c) 2016 Intel Corporation
@@ -8,7 +8,7 @@
 
 #if 0
 
-#define DT_DRV_COMPAT capella_cm3218
+#define DT_DRV_COMPAT st_stts75
 
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/sys/util.h>

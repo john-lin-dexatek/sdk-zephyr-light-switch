@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifndef ZEPHYR_DRIVERS_SENSOR_CM3218_CM3218_H_
-#define ZEPHYR_DRIVERS_SENSOR_CM3218_CM3218_H_
+#ifndef ZEPHYR_DRIVERS_SENSOR_CM32183_CM32183_H_
+#define ZEPHYR_DRIVERS_SENSOR_CM32183_CM32183_H_
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
@@ -105,45 +105,45 @@
 
 // #define ISL29035_INT_PRST_BITS	(ISL29035_INT_PRST_IDX << ISL29035_INT_PRST_SHIFT)
 
-struct cm3218_driver_data {
+struct cm32183_driver_data {
 	uint16_t data_sample;
 
-#if CONFIG_CM3218_TRIGGER
+#if CONFIG_CM32183_TRIGGER
 	const struct device *dev;
 	struct gpio_callback gpio_cb;
 
 	struct sensor_trigger th_trigger;
 	sensor_trigger_handler_t th_handler;
 
-#if defined(CONFIG_CM3218_TRIGGER_OWN_THREAD)
-	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_CM3218_THREAD_STACK_SIZE);
+#if defined(CONFIG_CM32183_TRIGGER_OWN_THREAD)
+	K_KERNEL_STACK_MEMBER(thread_stack, CONFIG_CM32183_THREAD_STACK_SIZE);
 	struct k_thread thread;
 	struct k_sem gpio_sem;
-#elif defined(CONFIG_CM3218_TRIGGER_GLOBAL_THREAD)
+#elif defined(CONFIG_CM32183_TRIGGER_GLOBAL_THREAD)
 	struct k_work work;
 #endif
 
-#endif /* CONFIG_CM3218_TRIGGER */
+#endif /* CONFIG_CM32183_TRIGGER */
 };
 
-struct cm3218_config {
+struct cm32183_config {
 	struct i2c_dt_spec i2c;
-#if CONFIG_CM3218_TRIGGER
+#if CONFIG_CM32183_TRIGGER
 	struct gpio_dt_spec int_gpio;
 #endif
 };
 
-#ifdef CONFIG_CM3218_TRIGGER
-// int cm3218_attr_set(const struct device *dev,
+#ifdef CONFIG_CM32183_TRIGGER
+// int cm32183_attr_set(const struct device *dev,
 // 		      enum sensor_channel chan,
 // 		      enum sensor_attribute attr,
 // 		      const struct sensor_value *val);
 
-// int cm3218_trigger_set(const struct device *dev,
+// int cm32183_trigger_set(const struct device *dev,
 // 			 const struct sensor_trigger *trig,
 // 			 sensor_trigger_handler_t handler);
 
-// int cm3218_init_interrupt(const struct device *dev);
+// int cm32183_init_interrupt(const struct device *dev);
 #endif
 
-#endif /* ZEPHYR_DRIVERS_SENSOR_CM3218_CM3218_H_ */
+#endif /* ZEPHYR_DRIVERS_SENSOR_CM32183_CM32183_H_ */

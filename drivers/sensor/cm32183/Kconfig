@@ -3,15 +3,15 @@
 # Copyright (c) 2016 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-menuconfig CM3218
-	bool "CM3218 light sensor"
+menuconfig CM32183
+	bool "CM32183 light sensor"
 	default y
-	depends on DT_HAS_CAPELLA_CM3218_ENABLED
+	depends on DT_HAS_CAPELLA_CM32183_ENABLED
 	select I2C
 	help
-	  Enable driver for the CM3218 light sensor.
+	  Enable driver for the CM32183 light sensor.
 
-if CM3218
+if CM32183
 
 # config ISL29035_THREAD_PRIORITY
 # 	int "Thread priority"

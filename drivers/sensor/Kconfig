@@ -79,7 +79,7 @@ source "drivers/sensor/bq274xx/Kconfig"
 
 source "drivers/sensor/ccs811/Kconfig"
 
-source "drivers/sensor/cm3218/Kconfig"
+source "drivers/sensor/cm32183/Kconfig"
 
 source "drivers/sensor/dht/Kconfig"
 

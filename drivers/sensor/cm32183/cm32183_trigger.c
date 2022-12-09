@@ -1,4 +1,4 @@
-/* sensor_isl29035.c - trigger support for ISL29035 light sensor */
+/* sensor_cm32183.c - trigger support for CM32183 light sensor */
 
 /*
  * Copyright (c) 2016 Intel Corporation

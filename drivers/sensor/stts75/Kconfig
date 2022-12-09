@@ -1,4 +1,4 @@
-# CM3218 light sensor configuration options
+# STTS75 light sensor configuration options
 
 # Copyright (c) 2016 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
@@ -9,7 +9,7 @@ menuconfig STTS75
 	depends on DT_HAS_ST_STTS75_ENABLED
 	select I2C
 	help
-	  Enable driver for the CM3218 light sensor.
+	  Enable driver for the STTS75 light sensor.
 
 if STTS75
 
