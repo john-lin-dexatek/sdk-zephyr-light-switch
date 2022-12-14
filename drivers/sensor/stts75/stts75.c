@@ -57,8 +57,13 @@ static int stts75_channel_get(const struct device *dev,
 	struct stts75_driver_data *drv_data = dev->data;
 	uint64_t tmp;
 
-	val->val1 = (drv_data->data_sample >> 8);
-	val->val2 = (uint8_t)drv_data->data_sample;
+	val->val1 = (int32_t)(drv_data->data_sample >> 8);
+	val->val2 = (int32_t)((uint8_t)drv_data->data_sample)*1000000/256;
+	
+	if ((val->val1 < 0) && (val->val2 != 0)) {
+		val->val1 += 1;
+		val->val2 = 1000000 - val->val2;
+	}
 
 	/* val = sample_val * lux_range / (2 ^ adc_data_bits) */
 	// tmp = (uint64_t)drv_data->data_sample * ISL29035_LUX_RANGE;
