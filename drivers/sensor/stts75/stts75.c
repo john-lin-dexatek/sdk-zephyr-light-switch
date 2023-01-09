@@ -55,7 +55,6 @@ static int stts75_channel_get(const struct device *dev,
 				struct sensor_value *val)
 {
 	struct stts75_driver_data *drv_data = dev->data;
-	uint64_t tmp;
 
 	val->val1 = (int32_t)(drv_data->data_sample >> 8);
 	val->val2 = (int32_t)((uint8_t)drv_data->data_sample)*1000000/256;
